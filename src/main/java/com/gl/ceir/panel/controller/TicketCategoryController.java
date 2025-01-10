@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.gl.ceir.panel.dto.TicketCategoryDto;
 import com.gl.ceir.panel.service.TicketCategoryService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -22,10 +23,12 @@ import lombok.extern.log4j.Log4j2;
 public class TicketCategoryController {
 	private final TicketCategoryService ticketService;
 
+	@Operation(hidden = true)
 	@PostMapping("save")
 	public ResponseEntity<?> save(@RequestBody TicketCategoryDto ticketDto) {
 		return new ResponseEntity<>(ticketService.save(ticketDto), HttpStatus.OK);
 	}
+	@Operation(hidden = true)
 	@GetMapping("list")
 	public ResponseEntity<?> list() {
 		return new ResponseEntity<>(ticketService.categories(), HttpStatus.OK);

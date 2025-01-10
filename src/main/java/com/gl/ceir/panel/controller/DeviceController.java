@@ -15,6 +15,7 @@ import com.gl.ceir.panel.dto.DeviceRequest;
 import com.gl.ceir.panel.repository.remote.DeviceRepositoryRemote;
 import com.gl.ceir.panel.repository.remote.GsmaRepositoryRemote;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -28,6 +29,7 @@ public class DeviceController {
 	private final DeviceRepositoryRemote deviceRepositoryRemote;
 	private final GsmaRepositoryRemote gsmaRepositoryRemote;
 	
+	@Operation(hidden = true)
 	@CrossOrigin(origins = "http://localhost:4200")
 	@PostMapping("page-view")
 	public @ResponseBody Object viewDeviceDetails(@RequestBody DeviceRequest deviceRequest) {
@@ -36,6 +38,7 @@ public class DeviceController {
 		return response;
 	}
 	
+	@Operation(hidden = true)
 	@PostMapping("/checkDevice")
 	public ResponseEntity<?> emailExist(@RequestBody CheckImeiRequest checkImeiRequest) {
 		return new ResponseEntity<>(gsmaRepositoryRemote.viewDetails(checkImeiRequest), HttpStatus.OK);

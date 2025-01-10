@@ -15,6 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gl.ceir.panel.dto.PaginationRequestDto;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -25,6 +29,7 @@ import lombok.extern.log4j.Log4j2;
 @RequestMapping("config")
 @AllArgsConstructor
 @NoArgsConstructor
+@Tag(name = "Return system level configuration")
 public class ConfigController {
 	@Value("${eirs.site.key:}")
 	private String siteKey;
@@ -41,10 +46,13 @@ public class ConfigController {
 	@Value("${sys_param.file.max-file-record:1000}")
 	private long rowSizeForExport;
 	
+	@Operation(hidden = true)
 	@PostMapping("system/pagination")
 	public ResponseEntity<?> pagination(@RequestBody PaginationRequestDto ulrd) {
 		return new ResponseEntity<>(null, HttpStatus.OK);
 	}
+	@Operation(summary = "Return configuration list for frontend", description = "Return list of configuration for frontend")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Ok")})
 	@GetMapping("frontend")
 	public ResponseEntity<?> frontend() {
 		return new ResponseEntity<>(readFrontendConfig(), HttpStatus.OK);

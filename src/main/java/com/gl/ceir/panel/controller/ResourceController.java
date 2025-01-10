@@ -20,6 +20,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gl.ceir.panel.dto.response.JwtResponse;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
 
@@ -27,23 +35,28 @@ import lombok.extern.log4j.Log4j2;
 @RestController
 @Log4j2
 @RequestMapping("resource")
+@Tag(name = "Return image/attachment based on resource")
 public class ResourceController {
 	@Value("${eirs.panel.source.path:}")
 	private String basepath;
 	@Value("${eirs.user.manual:}")
 	private String usermanual;
-	@Value("${ticket.content.disposition:inline}") //inline, attachment
+	@Value("${ticket.content.disposition:inline}") // inline, attachment
 	private String contentDisposition;
 
+	@Operation(summary = "Return image in response", description = "Return image by resource param")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Ok"),
+			@ApiResponse(responseCode = "424", description = "Missing Attachment") })
 	@GetMapping("/path")
-	public ResponseEntity<?> image(@RequestParam String resource, HttpServletResponse response) throws FileNotFoundException, IOException {
+	public ResponseEntity<?> image(@RequestParam String resource, HttpServletResponse response)
+			throws FileNotFoundException, IOException {
 		Path path = Paths.get(basepath + File.separator + resource);
 		boolean exist = Files.exists(path);
 		String contentType = Files.probeContentType(path);
 		if (exist) {
 			File file = new File(basepath + File.separator + resource);
 			HttpHeaders header = new HttpHeaders();
-			header.add(HttpHeaders.CONTENT_DISPOSITION, ""+contentDisposition+"; filename=" + file.getName());
+			header.add(HttpHeaders.CONTENT_DISPOSITION, "" + contentDisposition + "; filename=" + file.getName());
 			header.add("Cache-Control", "no-cache, no-store, must-revalidate");
 			header.add("Pragma", "no-cache");
 			header.add("Expires", "0");
@@ -53,25 +66,26 @@ public class ResourceController {
 		} else {
 			return new ResponseEntity<>("Missing Attachment", HttpStatus.FAILED_DEPENDENCY);
 		}
-		
+
 	}
+
+	@Operation(summary = "Download user manual", description = "User manual as downloadable")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Ok"),
+			@ApiResponse(responseCode = "424", description = "Missing Attachment") })
 	@GetMapping("/usermanual")
 	public ResponseEntity<?> usermanul(HttpServletResponse response) throws FileNotFoundException, IOException {
 		File file = new File(basepath + File.separator + usermanual);
 
-        HttpHeaders header = new HttpHeaders();
-        header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=usermanual.pdf");
-        header.add("Cache-Control", "no-cache, no-store, must-revalidate");
-        header.add("Pragma", "no-cache");
-        header.add("Expires", "0");
+		HttpHeaders header = new HttpHeaders();
+		header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=usermanual.pdf");
+		header.add("Cache-Control", "no-cache, no-store, must-revalidate");
+		header.add("Pragma", "no-cache");
+		header.add("Expires", "0");
 
-        Path path = Paths.get(file.getAbsolutePath());
-        ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
+		Path path = Paths.get(file.getAbsolutePath());
+		ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
 
-        return ResponseEntity.ok()
-                .headers(header)
-                .contentLength(file.length())
-                .contentType(MediaType.parseMediaType("application/octet-stream"))
-                .body(resource);
+		return ResponseEntity.ok().headers(header).contentLength(file.length())
+				.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
 	}
 }

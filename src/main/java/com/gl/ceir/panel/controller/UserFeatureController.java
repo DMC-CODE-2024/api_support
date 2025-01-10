@@ -17,6 +17,7 @@ import com.gl.ceir.panel.dto.UserFeatureDto;
 import com.gl.ceir.panel.entity.app.UserFeatureId;
 import com.gl.ceir.panel.service.UserFeatureService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -28,27 +29,33 @@ import lombok.extern.log4j.Log4j2;
 public class UserFeatureController {
 	private final UserFeatureService userFeatureService;
 	
+	@Operation(hidden = true)
 	@PostMapping("save")
 	public ResponseEntity<?> save(@RequestBody UserFeatureDto userFeatureDto, HttpServletRequest request) {
 		return new ResponseEntity<>(userFeatureService.save(userFeatureDto,request), HttpStatus.OK);
 	}
+	@Operation(hidden = true)
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getById(@PathVariable Long id){
 		return new ResponseEntity<>(userFeatureService.getById(id), HttpStatus.OK);
 	}
+	@Operation(hidden = true)
 	@PutMapping("/update/{id}")
 	public ResponseEntity<?> update(@RequestBody UserFeatureDto userFeatureDto, @PathVariable Long id, HttpServletRequest request) {
 		log.info("Role:{},update request:{}", id, userFeatureDto);
 		return new ResponseEntity<>(userFeatureService.update(userFeatureDto, id,request), HttpStatus.OK);
 	}
+	@Operation(hidden = true)
 	@PostMapping("delete")
 	public ResponseEntity<?> delete(@RequestBody List<UserFeatureId> ids, HttpServletRequest request) {
 		return new ResponseEntity<>(userFeatureService.delete(ids,request), HttpStatus.OK);
 	} 
+	@Operation(hidden = true)
 	@PostMapping("active")
 	public ResponseEntity<?> active(@RequestBody List<UserFeatureId> ids) {
 		return new ResponseEntity<>(userFeatureService.active(ids), HttpStatus.OK);
 	}
+	@Operation(hidden = true)
 	@PostMapping("pagination")
 	public ResponseEntity<?> pagination(@RequestBody PaginationRequestDto ulrd) {
 		return new ResponseEntity<>(userFeatureService.pagination(ulrd), HttpStatus.OK);

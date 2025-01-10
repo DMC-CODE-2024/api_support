@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gl.ceir.panel.service.SecurityQuestionService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -19,6 +20,7 @@ import lombok.extern.log4j.Log4j2;
 public class SecurityQuestionController {
 	private final SecurityQuestionService securityQuestionService;
 
+	@Operation(hidden = true)
 	@GetMapping("questions")
 	public ResponseEntity<?> list() {
 		return new ResponseEntity<>(securityQuestionService.list(), HttpStatus.OK);

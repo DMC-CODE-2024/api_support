@@ -17,6 +17,7 @@ import com.gl.ceir.panel.dto.DeviceRequest;
 import com.gl.ceir.panel.dto.LocaleDto;
 import com.gl.ceir.panel.service.LocaleService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.log4j.Log4j2;
 
 @CrossOrigin(origins = "http://localhost:4200")
@@ -28,6 +29,7 @@ public class LocaleController {
 	@Autowired
 	private LocaleService localeService; 
 	
+	@Operation(hidden = true)
 	@GetMapping("list")
 	public @ResponseBody List<LocaleDto> list() throws IOException {
 		return localeService.getLangCodes();
