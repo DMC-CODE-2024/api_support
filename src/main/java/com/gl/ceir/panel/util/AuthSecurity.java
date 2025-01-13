@@ -70,8 +70,7 @@ public class AuthSecurity {
 	public JwtResponse isSecurityPassed(LoginRequest loginRequest, HttpServletRequest request) {
 		JwtResponse jwtResponse = JwtResponse.builder().apiResult("success").build();
 		UserEntity entity = UserEntity.builder().build();
-		this.isAllowedSessionLimitBreached(loginRequest, jwtResponse, request)
-				.isLoggedIn(loginRequest, jwtResponse, request, entity)
+		this.isLoggedIn(loginRequest, jwtResponse, request, entity)
 				.isIpBlackListed(loginRequest, jwtResponse, request, entity)
 				.isOutsideRegion(loginRequest, jwtResponse, request);
 		return jwtResponse;

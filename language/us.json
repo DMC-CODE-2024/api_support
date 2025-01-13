@@ -83,7 +83,12 @@
         "assignGroup": "Assign Group",
         "resetAll": "Reset All",
         "verify": "Verify",
-        "resend": "Resend"
+        "resend": "Resend",
+        "add": "Add",
+        "all": "All",
+        "none": "None",
+        "remove": "Remove",
+        "login": "Login"
     },
     "filter": {
         "startDate": "Start Date",
@@ -98,7 +103,7 @@
         "firstName": "First Name",
         "lastName": "Last Name",
         "organization": "Organization",
-        "phoneNo": "Contact Number",
+        "phoneNo": "Mobile Number",
         "ticketId": "Ticket Number",
         "raisedBy": "Raised By",
         "ticketStatus": "Status",
@@ -121,7 +126,7 @@
         "groupFeatures": "Group Features"
     },
     "message": {
-        "verifyOtpFailed": "OTP verification failed",
+        "verifyOtpFailed": "OTP verification falied",
         "confirmation": "Are you sure you want to close this window? The form data will be lost.",
         "registerTicketSuccess": "Ticket registered successfully",
         "registerTicketFailed": "Please try again later or Contact System Admin",
@@ -130,22 +135,27 @@
         "failedAttemptReached": "Wrong password attempts more than limit, going to lock the user",
         "notValidTicketId": "Invalid ticket id",
         "sendOtpSuccess": "OTP has been sent successfully",
-        "otpMaxLimitReached": "Max allowed otp limit reached",
         "oldPasswordNotMatched": "Old password is not matched",
         "oldPasswordHistoryMatched": "New Password should be different from last three password",
         "changePasswordSuccess": "Password changed successfully, you will redirect automatically on login page after 5 seconds",
-        "saveUserFailed": "User registration is failed",
-        "saveUserSuccess": "User registered successfully",
+        "saveUserFailed": "User registration is falied",
+        "saveUserSuccess": "User registerd successfully",
         "inactive": "User is not activated yet",
         "groupNotAssigned": "No group is assigned yet",
         "passwordExpired": "Your password is going to expire in {{paswordpromptdays}} days.",
         "ccRegisterTicketSuccess": "A message and email along with Ticket ID <span class=\"fw-bold\">{{ticketId}}</span> and link is sent to registered contact number <span class=\"fw-bold\">{{countryCode}} {{mobileNumber}}</span> and email ID <span class=\"fw-bold\">{{emailAddress}}</span>",
         "ccRegisterTicketSuccessWithoutEmail": "A message and email along with Ticket ID <span class=\"fw-bold\">{{ticketId}}</span> and link is sent to registered contact number <span class=\"fw-bold\">{{mobileNumber}}</span>",
-        "ticketFileTypeNotMatched": "Accepts .jpg, .jpeg, .png and pdf file formats.",
+        "ticketFileTypeNotMatched": "Supported files .jpg, .jpeg, .png and pdf file formats.",
         "ticketFileSizeExceeded": "2MB max file size can be attached",
         "ticketFileLimit": "Maximum of 4 files can be attached",
         "parallelSessionLimitBreached": "Parallel session not allowed to login",
-        "userFileTypeNotMatched": "File Format is not valid"
+        "userFileTypeNotMatched": "File Format is not valid",
+        "userNidFileTypeNotMatched": "File Format not valid",
+        "userEmpIdCardFileTypeNotMatched": "File Format not valid",
+        "emailverifyOtpFailed": "Email OTP Verification Fail",
+        "userNidFileSizeExceeded": "2MB max file size can be attached.",
+        "userFileSizeExceeded": "2MB max file size can be attached",
+        "userEmpIdCardFileSizeExceeded": "2MB max file size can be attached"
     },
     "error": {
         "emailAlreadyRegistered": "Sorry, this email address is already registered."
@@ -428,8 +438,8 @@
         "userName": "User Name",
         "organization": "Organization",
         "ticketId": "Ticket Number",
-        "phone": "Contact Number",
-        "contactNumber": "Contact Number",
+        "phone": "Mobile Number",
+        "contactNumber": "Mobile Number",
         "subject": "Subject",
         "raisedBy": "Raised By",
         "userType": "User Type",
@@ -444,9 +454,6 @@
         "action": {
             "remove": "Remove Feature",
             "active": "Active Feature"
-        },
-        "multiLangSupport": {
-            "label": "Multi Language Support"
         },
         "pageTitle": {
             "title": "Feature Information",
@@ -535,12 +542,12 @@
             "label": "Ticket Number",
             "placeholder": "Enter Ticket Number",
             "error": "Please enter valid Ticket Number",
-            "forgot": "Forgot Ticket ID?",
+            "forgot": "Forgot Ticket Number?",
             "captcha": "Captcha Required",
             "listOfAttachments": "List of Attachments"
         },
         "forgotTicket": {
-            "title": "Forgot Ticket ID",
+            "title": "Forgot Ticket Number",
             "label": "Enter Submitted Mobile Number",
             "placeholder": "Enter Mobile Number",
             "error": "Contact Number Required",
@@ -548,7 +555,7 @@
             "view": "View Ticket?"
         },
         "verifyOtp": {
-            "forgotTicketId": "Forgot Ticket ID",
+            "forgotTicketId": "Forgot Ticket Number",
             "verifyOtp": "Verify OTP",
             "smsVerify": "SMS verify code sent to contact number",
             "enterOtp": "Please enter the code to verify",
@@ -577,8 +584,7 @@
             "label": "First Name",
             "placeholder": "Enter First Name",
             "error": {
-                "required": "First Name Required",
-                "pattern": "First name allowed as alphanumeric included space with minimum 2 and maximum 50 characters."
+                "required": "First Name Required"
             }
         },
         "lastName": {
@@ -594,8 +600,8 @@
             }
         },
         "alternateMobileNumber": {
-            "label": "Mobile Number for OTP",
-            "placeholder": "Enter Mobile Number for OTP"
+            "label": "Alternate Mobile Number",
+            "placeholder": "Enter Alternate Mobile Number"
         },
         "email": {
             "label": "Email Address",
@@ -647,14 +653,13 @@
             "placeholder": "Mark as Resolved",
             "confirmation": "Are you sure want to mark this ticket as resolved?",
             "resolveTicket": "Resolve Ticket?",
-            "required": "Comment is required",
+            "required": "Feedback is required",
             "comment": "Write new comment here(if any)"
         },
         "feedback": {
             "label": "Share your opinion with us!",
             "rate": "How would you rate it?",
             "write": "Write Feedback",
-            "required": "Feedback is required",
             "placeholder": "Write your feedback here..."
         },
         "document": {
@@ -670,13 +675,13 @@
         },
         "image": {
             "list": "List of Attached file",
-            "accept1": "Accepts .jpg, .jpeg, .png and pdf file formats.",
+            "accept1": "Supported files .jpg, .jpeg, .png and pdf file formats.",
             "accept2": "Maximum of 4 files and 2MB max file size can be attached"
         },
         "success": {
             "title1": "Ticket Successfully Registered",
-            "title2": "Ticket ID",
-            "message": "Your Ticket registered successfully with the Ticket id {{ticketId}}. This Ticket ID sent to your registered contact number and email ID.",
+            "title2": "Ticket Number",
+            "message": "Your Ticket registered successfully with the Ticket Number {ticketId}. This Ticket Number sent to your registered mobile number and email address.",
             "instructions": "Scan this QR code to check the status of your registered ticket and Download QR for future use",
             "note": "!Please note this ID for future use!"
         },
@@ -814,14 +819,12 @@
             "firstName": {
                 "label": "First Name",
                 "placeholder": "Enter First Name",
-                "error": "First Name Required",
-                "pattern": "First name allowed as alphanumeric included space with minimum 2 and maximum 50 characters."
+                "error": "First Name Required"
             },
             "lastName": {
                 "label": "Last Name",
                 "placeholder": "Enter Last Name",
-                "error": "Last name Required",
-                "pattern": "Last name allowed as alphanumeric included space with minimum 2 and maximum 50 characters."
+                "error": "Last name Required"
             }
         },
         "address": {
@@ -867,7 +870,8 @@
             "postal": {
                 "label": "Postal Code",
                 "placeholder": "Enter Postal Code",
-                "error": "Postal Code Required"
+                "error": "Postal Code Required",
+                "pattern": "Postal code is not valid"
             }
         },
         "id": {
@@ -956,7 +960,7 @@
                 "invaildEmail": "Please enter valid Email Address"
             },
             "mobile": {
-                "label": "Contact Number",
+                "label": "Mobile Number",
                 "placeholder": "Enter Contact Number",
                 "error": "Contact Number Required",
                 "pattern": "Contact Number is not valid",
@@ -1025,16 +1029,16 @@
         "supportTitle": "EIRS Support Team:",
         "postedOn": "Posted on",
         "ticketId": "Ticket Number",
-        "viewTicket": "View Ticket ID",
+        "viewTicket": "View Ticket Number",
         "createdOn": "Created on",
         "updatedOn": "Updated on",
         "raisedBy": "Raised by",
         "category": "Category",
-        "contactNumber": "Contact Number",
+        "contactNumber": "Mobile Number",
         "subject": "Subject",
         "description": "Ticket Description",
         "note": "Note",
-        "noteText": "Do not enter any Personally Identifiable Details (PID) while raising or adding comments in ticket",
+        "noteText": "Do not enter any personal identity information while rising or adding comments in ticket",
         "addComment": "Add new comment",
         "resolved": "Mark Ticket as Resolved",
         "resolvedGrivance": "Mark Grievance as Resolved",
@@ -1056,7 +1060,8 @@
         "welcome": "Welcome"
     },
     "prompt": {
-        "delete": "Are you sure you want to delete these items? This action cannot be undone.",
-        "active": "Are you sure you want to activate?"
+        "delete": "Are you sure you want to delete?",
+        "active": "Are you sure you want to activate?",
+        "resetpass": "Are you sure you want to reset the password?"
     }
 }

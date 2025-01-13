@@ -1,15 +1,16 @@
 package com.gl.ceir.panel.service;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.data.repository.init.ResourceReader;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,28 +32,24 @@ public class LanguageService {
 	public Object languagejson(String language) {
 		Object json = null;
 		try {
-			/*log.info("language:{},path:{}", language,
-					(sourcePath + File.separator + _LANGUAGE + File.separator + language));
-			json = objectMapper.readValue(new File(sourcePath + File.separator + _LANGUAGE + File.separator + language),
-					Object.class);*/
-			log.info("Language:{} to read", language);
+			log.info("Language:{}", language);
 			return read(language);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return json;
 	}
+
 	private Object read(String language) {
 		Object content = null;
-        try {
-        	//File file = ResourceUtils.getFile("classpath:language" + File.separator + language);
-        	//Resource res = resourceLoader.getResource("classpath:language"+ File.separator + language);
-        	InputStream in = this.getClass().getResourceAsStream("/language" + File.separator + language);
-        	content = IOUtils.toString(in, StandardCharsets.UTF_8);
-        	//content = new String(Files.readAllBytes(res.getFile().toPath()));
-        } catch (IOException e) {
-        	e.printStackTrace();
-        }
-        return content;
+		try {
+			ClassLoader classLoader = ResourceReader.class.getClassLoader();
+			try (InputStream in = new FileInputStream(Paths.get("").toAbsolutePath().toString() + File.separator + "language" + File.separator + language)) {
+				content = IOUtils.toString(in, StandardCharsets.UTF_8);
+	        }
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return content;
 	}
 }
