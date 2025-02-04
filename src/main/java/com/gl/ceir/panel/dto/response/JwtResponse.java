@@ -28,6 +28,8 @@ public class JwtResponse implements Serializable {
 	private Long id;
 	private String userName;
 	private String email;
+	private String firstName;
+	private String lastName;
 	private boolean isTemparoryPassword;
 	@Default
 	private long remainingExpiryDays = 0l;

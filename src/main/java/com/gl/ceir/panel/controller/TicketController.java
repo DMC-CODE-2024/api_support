@@ -118,10 +118,10 @@ public class TicketController {
 	@Operation(summary = "Send otp on a msisdn", description = "Send Otp on a msisdn")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Ok", content = {
 			@Content(mediaType = "application/json", schema = @Schema(implementation = ApiStatusDto.class)) }) })
-	@GetMapping("send-otp/{msisdn}")
-	public ResponseEntity<?> sendotp(@PathVariable String msisdn) {
+	@GetMapping("send-otp/{msisdn}/{language}")
+	public ResponseEntity<?> sendotp(@PathVariable String msisdn, @PathVariable String language) {
 		log.info("msisdn: {}", msisdn);
-		return new ResponseEntity<>(ticketService.sendotp(msisdn), HttpStatus.OK);
+		return new ResponseEntity<>(ticketService.sendotp(msisdn, language), HttpStatus.OK);
 	}
 	@Operation(summary = "Support dashboard", description = "Dashboard information")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Ok", content = {

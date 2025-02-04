@@ -47,4 +47,13 @@ public interface UserRepository extends CrudRepository<UserEntity, Long>, JpaSpe
 	@Transactional
 	@Query(value = "update UserEntity p set p.activeSession=p.activeSession - 1 where p.userName=:username")
 	public int decreaseActiveSession(String username);
+	
+	@Modifying
+	@Transactional
+	@Query(value = "update UserEntity p set p.userLanguage=:userLanguage where p.userName=:username")
+	public int updateLanguage(String username, String userLanguage);
+	
+	public UserEntity findOneByProfileEmail(String email);
+	
+	public UserEntity findOneByProfilePhoneNo(String msisdn);
 }

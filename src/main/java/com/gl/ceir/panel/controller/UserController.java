@@ -172,10 +172,10 @@ public class UserController {
 	@Operation(summary = "Send otp on user's email/msisdn based on otp channel", description = "Send otp response", hidden = false)
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Ok", content = {
 			@Content(mediaType = "application/json", schema = @Schema(implementation = ApiStatusDto.class)) }) })
-	@GetMapping("send-otp/{otpchannel}/{emailormsisdn}")
-	public ResponseEntity<?> sendotp(@PathVariable OtpChannelTypeEnum otpchannel, @PathVariable String emailormsisdn) {
+	@GetMapping("send-otp/{otpchannel}/{emailormsisdn}/{userId}")
+	public ResponseEntity<?> sendotp(@PathVariable OtpChannelTypeEnum otpchannel, @PathVariable String emailormsisdn, @PathVariable Long userId) {
 		log.info("Otp request for:{}, receiver id:{}", otpchannel, emailormsisdn);
-		return new ResponseEntity<>(userService.sendotp(otpchannel, emailormsisdn), HttpStatus.OK);
+		return new ResponseEntity<>(userService.sendotp(otpchannel, emailormsisdn, userId), HttpStatus.OK);
 	}
 
 	@Operation(summary = "Verify otp on user's email/msisdn based on otp channel", description = "Send otp response", hidden = false)

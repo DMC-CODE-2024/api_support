@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.gl.ceir.panel.constant.NotificationEnum;
 import com.gl.ceir.panel.dto.NotificationDto;
 import com.gl.ceir.panel.dto.PaginationRequestDto;
 import com.gl.ceir.panel.dto.TicketDto;
@@ -33,6 +34,7 @@ import com.gl.ceir.panel.dto.response.AttachmentDetailsDto;
 import com.gl.ceir.panel.dto.response.PaginationDto;
 import com.gl.ceir.panel.dto.response.RedminUploadDto;
 import com.gl.ceir.panel.dto.response.TicketResponseDto;
+import com.gl.ceir.panel.entity.app.EirsResponseParamEntity;
 import com.gl.ceir.panel.entity.app.TicketEntity;
 import com.gl.ceir.panel.entity.app.UserEntity;
 import com.gl.ceir.panel.repository.app.TicketRepository;
@@ -150,23 +152,32 @@ public class TicketService {
 				values.put("ticketId", ticketResponse.getTicketId());
 				values.put("mobile", msisdn);
 				values.put("email", email);
+				values.put("lang", ticketDto.getLanguage());
 				values.put("firstName", ticketDto.getFirstName());
 				values.put("lastName", StringUtils.isNotEmpty(ticketDto.getLastName()) ? ticketDto.getLastName(): "");
 				values.put("email", StringUtils.isNotEmpty(ticketDto.getEmailAddress()) ? ticketDto.getEmailAddress(): "");
 				values.put("link", placeholderUtil.message(values, ticketLink));
-				
-				NotificationDto smsrequest = NotificationDto.builder().channelType(smsPromoChannelType)
-						.message(placeholderUtil.message(values, ticketCreateSms)).userId(ObjectUtils.isNotEmpty(user) ? user.getId(): null)
-						.operatorName(operatorUtil.getOperator(msisdn)).msisdn(msisdn).featureId(null)
-						.featureName(ticketFeatureName).featureTxnId(ticketResponse.getTicketId()).build();
-				
-				NotificationDto emailrequest = NotificationDto.builder().channelType(emailPromoChannelType)
-						.message(placeholderUtil.message(values, ticketCreateEmail))
-						.subject(placeholderUtil.message(values, ticketCreateEmailSubject))
-						.featureName(ticketFeatureName).email(ticketDto.getEmailAddress()).featureId(null)
-						.featureTxnId(ticketResponse.getTicketId()).userId(ObjectUtils.isNotEmpty(user) ? user.getId(): null).build();
-				if(ObjectUtils.isNotEmpty(msisdn))this.sendnotification(smsrequest);
-				if(ObjectUtils.isNotEmpty(ticketDto.getEmailAddress()))this.sendnotification(emailrequest);
+				try {
+					EirsResponseParamEntity smsmsg = notificationHelper.getMessage(NotificationEnum.ticketCreate.sms,ticketDto.getLanguage());
+					NotificationDto smsrequest = NotificationDto.builder().channelType(smsPromoChannelType)
+							.message(placeholderUtil.message(values, smsmsg.getValue()))
+							.userId(ObjectUtils.isNotEmpty(user) ? user.getId() : null).msgLang(smsmsg.getLanguage())
+							.operatorName(operatorUtil.getOperator(msisdn)).msisdn(msisdn).featureId(null)
+							.featureName(ticketFeatureName).featureTxnId(ticketResponse.getTicketId()).build();
+					
+					EirsResponseParamEntity emailmsg = notificationHelper.getMessage(NotificationEnum.ticketCreate.email,ticketDto.getLanguage());
+					
+					NotificationDto emailrequest = NotificationDto.builder().channelType(emailPromoChannelType)
+							.message(placeholderUtil.message(values, emailmsg.getValue())).msgLang(emailmsg.getLanguage())
+							.subject(placeholderUtil.message(values, emailmsg.getSubject()))
+							.featureName(ticketFeatureName).email(ticketDto.getEmailAddress()).featureId(null)
+							.featureTxnId(ticketResponse.getTicketId())
+							.userId(ObjectUtils.isNotEmpty(user) ? user.getId() : null).build();
+					if(ObjectUtils.isNotEmpty(msisdn) && StringUtils.isNotEmpty(smsmsg.getValue()))this.sendnotification(smsrequest);
+					if(ObjectUtils.isNotEmpty(ticketDto.getEmailAddress())&& StringUtils.isNotEmpty(emailmsg.getValue()))this.sendnotification(emailrequest);
+				}catch(Exception e) {
+					log.error("Error while send ticket create notification:{}", e.getMessage());
+				}
 				ticketResponse = ticketResponse.toBuilder().message("registerTicketSuccess").build();
 			} else {
 				log.warn("Msisdn:{} not valid for ticket, so ticket will not be created", msisdn);
@@ -316,19 +327,29 @@ public class TicketService {
 		return null;
 	}
 
-	public ApiStatusDto sendotp(String msisdn) {
+	public ApiStatusDto sendotp(String msisdn, String langauge) {
 		try {
 			UserEntity user = userService.getLoggedInUser();
+			langauge = ObjectUtils.isNotEmpty(user) ? user.getUserLanguage() : langauge;
 			String otp = otpUtil.phoneOtp(msisdn);
 			Map<String, String> values = new HashMap<String, String>();
 			values.put("otp", otp);
+			if(ObjectUtils.isNotEmpty(user)) {
+				values.put("email", ObjectUtils.isNotEmpty(user.getProfile()) ? user.getProfile().getEmail(): "");
+				values.put("firstName", ObjectUtils.isNotEmpty(user.getProfile()) ? user.getProfile().getFirstName(): "");
+				values.put("lastName", ObjectUtils.isNotEmpty(user.getProfile()) ? user.getProfile().getLastName(): "");
+				values.put("mobile", ObjectUtils.isNotEmpty(user.getProfile()) ? user.getProfile().getPhoneNo(): "");
+				values.put("username", user.getUserName());
+				values.put("lang", langauge);
+			}
+			EirsResponseParamEntity emailmsg = notificationHelper.getMessage(NotificationEnum.forgotTicket.sms,langauge);
 			NotificationDto request = NotificationDto.builder().channelType(smsChannelType)
-					.message(placeholderUtil.message(values, otpMessage)).featureName(ticketFeatureName).msisdn(msisdn)
-					.featureTxnId(String.valueOf(System.currentTimeMillis()))
+					.message(placeholderUtil.message(values, emailmsg.getValue())).featureName(ticketFeatureName).msisdn(msisdn)
+					.featureTxnId(String.valueOf(System.currentTimeMillis())).msgLang(emailmsg.getLanguage())
 					.operatorName(operatorUtil.getOperator(msisdn)).featureId(null)
 					.userId(ObjectUtils.isNotEmpty(user) ? user.getId() : null).build();
 			log.info("Generated otp:{}, for msisdn:{},request:{}", otp, msisdn, request);
-			notificationHelper.send(request);
+			if(StringUtils.isNotEmpty(emailmsg.getValue())) notificationHelper.send(request);
 			otpMap.put(msisdn, otp);
 			log.info("Otp map size:{}", otpMap.size());
 			return ApiStatusDto.builder().message("sendOtpSuccess").build();
@@ -341,8 +362,13 @@ public class TicketService {
 	public ApiStatusDto verifyOtp(String msisdn, String otp) {
 		PaginationDto tickets = PaginationDto.builder().build();
 		try {
-			tickets = redmineRemoteRepository.ticketByMsisdn(msisdn,0,10,
-				ticketHelper.toRedmineHeader(TicketDto.builder().mobileNumber("DUMMY_AGENT").build()));
+			try {
+				tickets = redmineRemoteRepository.ticketByMsisdn(msisdn,0,10,
+						ticketHelper.toRedmineHeader(TicketDto.builder().mobileNumber(msisdn).build()));
+			}catch(Exception e) {
+				tickets = tickets.toBuilder().content(new ArrayList<TicketResponseDto>()).build();
+				log.error("Error while fetching ticket by msisdn during verify otp:{}", e.getMessage());
+			}
 			String sentotp = otpMap.get(msisdn);
 			log.info("Recieved otp:{}, for msisdn:{},size:{},cache otp:{},otp map size:{}", otp, msisdn, tickets.getContent().size(),sentotp, otpMap.size());
 			return ObjectUtils.isNotEmpty(sentotp) && otp.equals(sentotp)
@@ -351,6 +377,7 @@ public class TicketService {
 					: ApiStatusDto.builder().message("verifyOtpFailed").size(tickets.getContent().size())
 							.id(CollectionUtils.isNotEmpty(tickets.getContent()) ? tickets.getContent().get(0).getTicketId() : "").build();
 		}catch(Exception e) {
+			e.printStackTrace();
 			log.error("Error while fetching ticket by msisdn during verify otp:{}", e.getMessage());
 			return ApiStatusDto.builder().message("verifyOtpFailed").size(tickets.getContent().size()).build();
 		}

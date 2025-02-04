@@ -27,6 +27,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.util.unit.DataSize;
 
 import com.gl.ceir.panel.repository.app.UserRepository;
+import com.gl.ceir.panel.util.PlaceholderUtil;
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 
 import jakarta.servlet.MultipartConfigElement;
@@ -49,6 +50,11 @@ public class UserApplication implements CommandLineRunner {
 	private int jwtExpirationMs;
 	@Autowired
 	private UserRepository userRepository;
+	@Autowired
+	private PlaceholderUtil placeholderUtil;
+	
+	@Value("${eirs.otp.email.change.message:}")
+	private String str;
 	
 	public static void main(String[] args) {
 		SpringApplication.run(UserApplication.class, args);
@@ -71,10 +77,13 @@ public class UserApplication implements CommandLineRunner {
 		headers.add("X-Redmine-API-Key", redmineKey);
 		return headers;
 	}
+	
 
 	@Override
 	public void run(String... args) throws Exception {
-
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("otp", "12345");
+		System.out.print("###################string: " + placeholderUtil.message(map, str));
 	}
 
 	@Bean

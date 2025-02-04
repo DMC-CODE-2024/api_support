@@ -70,6 +70,7 @@ public class AuthController {
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest,
 			HttpServletRequest request) {
+		log.info("Login request:{}", request);
 		return ResponseEntity.ok(authSecurity.isSecurityPassed(loginRequest, request));
 	}
 

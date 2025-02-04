@@ -16,6 +16,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.map.PassiveExpiringMap;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -32,6 +33,7 @@ import com.gl.ceir.panel.constant.FeatureEnum;
 import com.gl.ceir.panel.constant.HttpStatusEnum;
 import com.gl.ceir.panel.constant.LogicalDirectoryEnum;
 import com.gl.ceir.panel.constant.MessaeEnum;
+import com.gl.ceir.panel.constant.NotificationEnum;
 import com.gl.ceir.panel.constant.OtpChannelTypeEnum;
 import com.gl.ceir.panel.constant.StatusEnum;
 import com.gl.ceir.panel.constant.UserTypeEnum;
@@ -47,6 +49,7 @@ import com.gl.ceir.panel.dto.response.AuthDto;
 import com.gl.ceir.panel.dto.response.BooleanDto;
 import com.gl.ceir.panel.dto.response.FeautreMenuDto;
 import com.gl.ceir.panel.dto.response.MessageResponse;
+import com.gl.ceir.panel.entity.app.EirsResponseParamEntity;
 import com.gl.ceir.panel.entity.app.FeatureEntity;
 import com.gl.ceir.panel.entity.app.UserEntity;
 import com.gl.ceir.panel.entity.app.UserGroupEntity;
@@ -74,6 +77,7 @@ import lombok.extern.log4j.Log4j2;
 @Service
 @RequiredArgsConstructor()
 @Log4j2
+@SuppressWarnings("unused")
 public class UserService {
 	@Value("${eirs.panel.source.path:}")
 	private String basepath;
@@ -276,6 +280,7 @@ public class UserService {
 			if (isexisting == false) {
 				try {
 					FeatureEntity feature = featureRepository.findOneByLink(FeatureEnum.User.getName());
+					String lang = ObjectUtils.isEmpty(userEntity) || StringUtils.isEmpty(userEntity.getUserLanguage()) ? "us" : userEntity.getUserLanguage();
 					if(ObjectUtils.isNotEmpty(feature)) {
 						Map<String, String> values = new HashMap<String, String>();
 						values.put("password", password);
@@ -284,18 +289,21 @@ public class UserService {
 						values.put("lastName", ObjectUtils.isNotEmpty(tobesave.getProfile()) ? tobesave.getProfile().getLastName(): "");
 						values.put("mobile", ObjectUtils.isNotEmpty(tobesave.getProfile()) ? tobesave.getProfile().getPhoneNo(): "");
 						values.put("username", tobesave.getUserName());
+						values.put("lang", lang);
+						EirsResponseParamEntity emailmsg = notificationHelper.getMessage(NotificationEnum.userCreate.email,lang);
 						NotificationDto notification = NotificationDto.builder()
-								.channelType(emailPromoChannelType)
-								.message(placeholderUtil.message(values, userCreateEmail))
-								.subject(placeholderUtil.message(values, userCreateEmailSubject)).featureName(feature.getFeatureName())
+								.channelType(emailPromoChannelType).msgLang(emailmsg.getLanguage())
+								.message(placeholderUtil.message(values, emailmsg.getValue()))
+								.subject(placeholderUtil.message(values, emailmsg.getSubject())).featureName(feature.getFeatureName())
 								.featureTxnId(String.valueOf(System.currentTimeMillis())).userId(ObjectUtils.isNotEmpty(savedEntity) ? savedEntity.getId(): null)
 								.featureId(feature.getId()).email(savedEntity.getProfile().getEmail()).build();
 						log.info("Temparory password and user id in email:{}", notification);
-						notificationHelper.send(notification);
+						if(StringUtils.isNotEmpty(emailmsg.getSubject()))notificationHelper.send(notification);
 					}
 					
 				} catch (Exception e) {
-					log.error("Error while send notification:{}", e.getMessage());
+					e.printStackTrace();
+					log.error("Error while send notification:{}", e.getMessage(), e);
 				}
 			}
 			redmineBackendService.saveUser(savedEntity.getUserName());
@@ -307,7 +315,7 @@ public class UserService {
 			return ResponseEntity.ok().body(MessageResponse.builder().status(HttpStatusEnum.SUCCESS.status)
 					.code(HttpStatus.OK).message(MessaeEnum.SAVE_USER_SUCCESS.message).build());
 		} catch (Exception e) {
-			log.info("Message: {}", e.getMessage());
+			log.info("Message: {}", e.getMessage(), e);
 			return ResponseEntity.ok().body(MessageResponse.builder().status(HttpStatusEnum.FAILED.status)
 					.code(HttpStatus.OK).message(MessaeEnum.SAVE_USER_FAILED.message).build());
 		}
@@ -424,22 +432,27 @@ public class UserService {
 					user.setPasswordDate(LocalDateTime.now());
 					user.setPassword(encoder.encode(password));
 					Map<String, String> values = new HashMap<String, String>();
+					String lang = StringUtils.isEmpty(user.getUserLanguage()) ? entity.getUserLanguage(): user.getUserLanguage();
+					lang = StringUtils.isEmpty(lang) ? "us": lang;
 					values.put("password", password);
 					values.put("email", ObjectUtils.isNotEmpty(user.getProfile()) ? user.getProfile().getEmail(): "");
 					values.put("firstName", ObjectUtils.isNotEmpty(user.getProfile()) ? user.getProfile().getFirstName(): "");
 					values.put("lastName", ObjectUtils.isNotEmpty(user.getProfile()) ? user.getProfile().getLastName(): "");
 					values.put("mobile", ObjectUtils.isNotEmpty(user.getProfile()) ? user.getProfile().getPhoneNo(): "");
 					values.put("username", user.getUserName());
+					values.put("lang", lang);
+					
+					EirsResponseParamEntity emailmsg = notificationHelper.getMessage(NotificationEnum.resetPassword.email,lang);
 					
 					NotificationDto notification = NotificationDto.builder()
-							.channelType(OtpChannelTypeEnum.EMAIL.name())
-							.message(placeholderUtil.message(values, resetPasswordMessage))
-							.subject(placeholderUtil.message(values, resetPasswordSubject))
+							.channelType(OtpChannelTypeEnum.EMAIL.name()).msgLang(emailmsg.getLanguage())
+							.message(placeholderUtil.message(values, emailmsg.getValue()))
+							.subject(placeholderUtil.message(values, emailmsg.getSubject()))
 							.email(user.getProfile().getEmail()).featureName(featureobj.getFeatureName())
 							.featureTxnId(String.valueOf(System.currentTimeMillis())).featureId(featureobj.getId())
 							.userId(ObjectUtils.isNotEmpty(entity) ? entity.getId(): null)
 							.build();
-					notificationHelper.send(notification);
+					if(StringUtils.isNotEmpty(emailmsg.getValue())) notificationHelper.send(notification);
 					FeatureEnum feature = FeatureEnum.User;
 					ActionEnum action = ActionEnum.ResetPassword;
 					String details = String.format("%s's password [%s] has been %s", feature,
@@ -493,11 +506,14 @@ public class UserService {
 		List<Long> groups = new ArrayList<>();
 		return new ResponseEntity<>(permissionService.groups(groups, groupId), HttpStatus.OK);
 	}
-	public ApiStatusDto sendotp(OtpChannelTypeEnum otpchannel, String emailormsisdn) {
+	public ApiStatusDto sendotp(OtpChannelTypeEnum otpchannel, String emailormsisdn, Long userId) {
 		try {
 			UserEntity user = getLoggedInUser();
 			FeatureEntity featureobj = featureRepository.findOneByLink(FeatureEnum.User.getName());
 			String otp = otpUtil.phoneOtp(emailormsisdn);
+			UserEntity entity = userRepository.findById(userId).orElse(user);
+			String language = StringUtils.isEmpty(entity.getUserLanguage()) ? user.getUserLanguage(): entity.getUserLanguage();
+			language = StringUtils.isEmpty(language) ? "us": language;
 			log.info("Generated otp:{}, for:{},senderid:{}", otp, otpchannel, emailormsisdn);
 			Map<String, String> values = new HashMap<String, String>();
 			values.put("otp", otp);
@@ -506,18 +522,23 @@ public class UserService {
 			values.put("lastName", ObjectUtils.isNotEmpty(user.getProfile()) ? user.getProfile().getLastName(): "");
 			values.put("mobile", ObjectUtils.isNotEmpty(user.getProfile()) ? user.getProfile().getPhoneNo(): "");
 			values.put("username", user.getUserName());
+			values.put("lang", language);
+			
 			if(otpchannel==OtpChannelTypeEnum.EMAIL) {
+				EirsResponseParamEntity emailmsg = notificationHelper.getMessage(NotificationEnum.changeMobileOrEmail.email,language);
 				notificationHelper.send(NotificationDto.builder().channelType(emailChannelType).email(emailormsisdn)
-						.message(placeholderUtil.message(values, emailChangeMessage)).featureName(featureobj.getFeatureName())
+						.message(placeholderUtil.message(values, emailmsg.getValue())).featureName(featureobj.getFeatureName())
+						.subject(placeholderUtil.message(values, emailmsg.getSubject())).msgLang(emailmsg.getLanguage())
 						.featureId(featureobj.getId()).featureTxnId(String.valueOf(System.currentTimeMillis()))
 						.userId(ObjectUtils.isNotEmpty(user) ? user.getId(): null).build());
 				
 			} else if(otpchannel==OtpChannelTypeEnum.SMS) {
+				EirsResponseParamEntity smsmsg = notificationHelper.getMessage(NotificationEnum.changeMobileOrEmail.sms,language);
 				String countrycode = countryCode.startsWith("+") ? countryCode.substring(1, countryCode.length()): countryCode; 
 				emailormsisdn = emailormsisdn.startsWith(countrycode) ? emailormsisdn : countrycode + emailormsisdn;
-				notificationHelper.send(NotificationDto.builder().channelType(smsChannelType)
+				notificationHelper.send(NotificationDto.builder().channelType(smsChannelType).msgLang(smsmsg.getLanguage())
 						.msisdn(emailormsisdn).operatorName(operatorUtil.getOperator(emailormsisdn))
-						.message(placeholderUtil.message(values, mobileChangeMessage)).featureName(featureobj.getFeatureName())
+						.message(placeholderUtil.message(values, smsmsg.getValue())).featureName(featureobj.getFeatureName())
 						.featureId(featureobj.getId()).featureTxnId(String.valueOf(System.currentTimeMillis()))
 						.userId(ObjectUtils.isNotEmpty(user) ? user.getId(): null).build());
 			}

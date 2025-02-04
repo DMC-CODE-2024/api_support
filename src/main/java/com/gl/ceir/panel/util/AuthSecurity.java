@@ -1,5 +1,7 @@
 package com.gl.ceir.panel.util;
 
+import java.net.Inet6Address;
+import java.net.InetAddress;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -10,6 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,7 +21,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.gl.ceir.panel.constant.StatusEnum;
+import com.gl.ceir.panel.dto.CheckCountryDto;
 import com.gl.ceir.panel.dto.request.LoginRequest;
+import com.gl.ceir.panel.dto.response.CheckCountryResponseDto;
 import com.gl.ceir.panel.dto.response.JwtResponse;
 import com.gl.ceir.panel.entity.app.UserEntity;
 import com.gl.ceir.panel.entity.app.UserFeatureIpAccessListEntity;
@@ -26,6 +31,7 @@ import com.gl.ceir.panel.entity.app.UserGroupEntity;
 import com.gl.ceir.panel.repository.app.UserFeatureIpAccessListRepository;
 import com.gl.ceir.panel.repository.app.UserGroupRepository;
 import com.gl.ceir.panel.repository.app.UserRepository;
+import com.gl.ceir.panel.repository.remote.CheckIpCountryRemoteRepostiory;
 import com.gl.ceir.panel.security.jwt.JwtUtils;
 import com.gl.ceir.panel.security.jwt.service.UserDetailsImpl;
 import com.gl.ceir.panel.service.AclService;
@@ -50,6 +56,7 @@ public class AuthSecurity {
 	private final UserFeatureIpAccessListRepository featureIpAccessListRepository;
 	private final JwtUtils jwtUtils;
 	private final UserPasswordService userPasswordService;
+	private final CheckIpCountryRemoteRepostiory checkIpCountryRemoteRepostiory;
 	private final Map<String, Integer> sessionMap;
 	@Value("${eirs.allowed.failed.login.attempts:3}")
 	private int allowedFailedLoginAttempts;
@@ -57,6 +64,8 @@ public class AuthSecurity {
 	private int allowedParallelSession;
 	private List<String> notLoggedInList = Arrays.asList("0","4","5","21");
 	private Map<String, String> statusmesage = new HashMap<String, String>();
+	@Value("${eirs.allowed.countries.to.access.public.portal:}")
+	private List<String> allowedCountries;
 	
 	@PostConstruct
 	private void init() {
@@ -110,8 +119,9 @@ public class AuthSecurity {
 				userRepository.save(ueo.get().toBuilder().lastLoginDate(LocalDateTime.now()).failedAttempt(0)
 						.activeSession(ueo.get().getActiveSession() + 1).build());
 				entity.setId(ueo.get().getId());
+				jwtResponse.setFirstName(ueo.get().getProfile().getFirstName());
+				jwtResponse.setLastName(ueo.get().getProfile().getLastName());
 			}
-			
 			jwtResponse.setId(userDetails.getId());
 			jwtResponse.setUserName(userDetails.getUsername());
 			jwtResponse.setToken(jwt);
@@ -133,7 +143,9 @@ public class AuthSecurity {
 	
 	private AuthSecurity isOutsideRegion(LoginRequest loginRequest, JwtResponse jwtResponse, HttpServletRequest request) {
 		log.info("Response:{}", jwtResponse);
-		if(jwtResponse.getApiResult().equals("fail") == false && aclService.isAccessAllow(request.getRemoteAddr()) == false) {
+		if (jwtResponse.getApiResult().equals("fail") == false
+				&& aclService.isAccessAllow(StringUtils.isEmpty(loginRequest.getPublicIP()) ? request.getRemoteAddr()
+						: loginRequest.getPublicIP()) == false) {
 			jwtResponse.setMessage("loginFromOutsideRegion");
 			jwtResponse.setApiResult("fail");
 		}

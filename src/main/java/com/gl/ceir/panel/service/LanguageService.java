@@ -14,6 +14,7 @@ import org.springframework.data.repository.init.ResourceReader;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gl.ceir.panel.repository.app.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -28,16 +29,26 @@ public class LanguageService {
 	private final static String _LANGUAGE = "language";
 	private final ObjectMapper objectMapper;
 	private final ResourceLoader resourceLoader;
+	private final UserService userService;
+	private final UserRepository userRepository;
 
 	public Object languagejson(String language) {
 		Object json = null;
 		try {
 			log.info("Language:{}", language);
+			this.updateLanguage(language);
 			return read(language);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return json;
+	}
+	public int updateLanguage(String language) {
+		try {
+			return userRepository.updateLanguage(userService.getLoggedInUser().getUserName(), language);
+		}catch(Exception e) {
+			return 0;
+		}
 	}
 
 	private Object read(String language) {

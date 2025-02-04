@@ -123,7 +123,8 @@
         "tags": "Tags",
         "userFeatures": "User Features",
         "modules": "Modules",
-        "groupFeatures": "Group Features"
+        "groupFeatures": "Group Features",
+        "tickets": "Tickets"
     },
     "message": {
         "verifyOtpFailed": "OTP verification falied",
@@ -250,6 +251,10 @@
         }
     },
     "userGroup": {
+        "action": {
+            "remove": "Remove User From Group",
+            "active": "Active User From Group"
+        },
         "pageTitle": {
             "title": "User Group Information",
             "view": "View User Group",
@@ -544,7 +549,10 @@
             "error": "Please enter valid Ticket Number",
             "forgot": "Forgot Ticket Number?",
             "captcha": "Captcha Required",
-            "listOfAttachments": "List of Attachments"
+            "listOfAttachments": "List of Attachments",
+            "endUserTicketList": "User Ticket List",
+            "pattern": "Ticket should start with 'T' with length of 17",
+            "endUserTicketsHeader": "Ticket Status"
         },
         "forgotTicket": {
             "title": "Forgot Ticket Number",
@@ -567,6 +575,7 @@
             "view": "View Ticket",
             "add": "Register Ticket",
             "edit": "Edit Ticket",
+            "verifyOtp": "Verify OTP",
             "list": "Ticket Management",
             "delete": "Delete Ticket",
             "success": "Ticket Registered Successfully",
@@ -589,7 +598,10 @@
         },
         "lastName": {
             "label": "Last Name",
-            "placeholder": "Enter Last Name"
+            "placeholder": "Enter Last Name",
+            "error": {
+                "required": "First Name Required"
+            }
         },
         "phone": {
             "label": "Mobile Number",
@@ -619,7 +631,8 @@
             "label": "Transaction Number",
             "placeholder": "Enter Transaction Number ",
             "error": {
-                "required": "Transaction Number Required"
+                "required": "Transaction Number Required",
+                "pattern": "Transaction should be min 5 and max 50"
             }
         },
         "priority": {
@@ -634,7 +647,8 @@
             "label": "Subject",
             "placeholder": "Enter Subject",
             "error": {
-                "required": "Subject Required"
+                "required": "Subject Required",
+                "pattern": "Subject should be 5 and max 50 length"
             }
         },
         "referenceId": {
@@ -645,7 +659,8 @@
             "label": "Description",
             "placeholder": "Provide Description Here",
             "error": {
-                "required": "Description Required"
+                "required": "Description Required",
+                "pattern": "Description should be 5 and max 50 length"
             }
         },
         "resolved": {
@@ -666,6 +681,7 @@
             "label": "Upload Supporting Document(if any)",
             "documentLabel": "File Type",
             "placeholder": "Attach",
+            "type": "Document Type:",
             "error": {
                 "documentRequired": "Document Type is required"
             }
@@ -675,6 +691,7 @@
         },
         "image": {
             "list": "List of Attached file",
+            "view": "List of Attachments",
             "accept1": "Supported files .jpg, .jpeg, .png and pdf file formats.",
             "accept2": "Maximum of 4 files and 2MB max file size can be attached"
         },
@@ -819,12 +836,14 @@
             "firstName": {
                 "label": "First Name",
                 "placeholder": "Enter First Name",
-                "error": "First Name Required"
+                "error": "First Name Required",
+                "pattern": "First Name allowed min 5 and max 50 length"
             },
             "lastName": {
                 "label": "Last Name",
                 "placeholder": "Enter Last Name",
-                "error": "Last name Required"
+                "error": "Last name Required",
+                "pattern": "Last Name allowed min 5 and max 50 length"
             }
         },
         "address": {

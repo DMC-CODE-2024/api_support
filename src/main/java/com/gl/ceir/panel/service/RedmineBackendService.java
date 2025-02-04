@@ -47,25 +47,29 @@ public class RedmineBackendService {
 			log.info("Going to create redmine user:{}", username);
 			UserEntity user = userRepository.findByUserName(username).orElse(null);
 			RedmineBackendResponse redmine = this.getRedmineUser(username);
-			if (ObjectUtils.isNotEmpty(user) && ObjectUtils.isEmpty(redmine) && CollectionUtils.isNotEmpty(redmine.getUsers())) {
-				RedmineUserDto ruser = RedmineUserDto.builder().admin(true).firstname(user.getProfile().getFirstName())
-						.lastname(user.getProfile().getLastName()).login(user.getUserName())
-						.mail(user.getProfile().getEmail()).password(username).build();
-				RedmineBackendResponse request = RedmineBackendResponse.builder().user(ruser).build();
-				log.info("Redmine backend user request:{}", request);
-				RedmineBackendResponse response = redmineBackendRepository.save(request, toRedmineBackendHeader);
-				log.info("Redmine backend user response:{}", response);
-				created = true;
+			if(ObjectUtils.isNotEmpty(user)) {
+				if (ObjectUtils.isEmpty(redmine) || CollectionUtils.isEmpty(redmine.getUsers())) {
+					RedmineUserDto ruser = RedmineUserDto.builder().admin(true).firstname(user.getProfile().getFirstName())
+							.lastname(user.getProfile().getLastName()).login(user.getUserName())
+							.mail(user.getProfile().getEmail()).password(username).build();
+					RedmineBackendResponse request = RedmineBackendResponse.builder().user(ruser).build();
+					log.info("Fresh redmine backend user request:{}", request);
+					RedmineBackendResponse response = redmineBackendRepository.save(request, toRedmineBackendHeader);
+					log.info("Fresh redmine backend user response:{}", response);
+					created = true;
+				} else {
+					log.info("Already registered redmine user:{}", redmine);
+					RedmineUserDto ruser = RedmineUserDto.builder().firstname(user.getProfile().getFirstName())
+							.lastname(user.getProfile().getLastName()).mail(user.getProfile().getEmail()).build();
+					RedmineBackendResponse request = RedmineBackendResponse.builder().user(ruser).build();
+					log.info("Already registered redmine backend user request:{}", request);
+					redmineBackendRepository.update(redmine.getUsers().get(0).getId(),request, toRedmineBackendHeader);
+				}
 			} else {
-				log.info("Redmine user:{}", redmine);
-				RedmineUserDto ruser = RedmineUserDto.builder().firstname(user.getProfile().getFirstName())
-						.lastname(user.getProfile().getLastName()).mail(user.getProfile().getEmail()).build();
-				RedmineBackendResponse request = RedmineBackendResponse.builder().user(ruser).build();
-				log.info("Redmine backend user request:{}", request);
-				redmineBackendRepository.update(redmine.getUsers().get(0).getId(),request, toRedmineBackendHeader);
+				log.warn("User is empty in user empty, no user will create in redmine");
 			}
 		} catch (Exception e) {
-			log.info("Error:{} while create user:{} in redmine", e.getMessage(), username);
+			log.info("Error:{} while create user:{} in redmine", e.getMessage(), username, e);
 		}
 		return created;
 	}

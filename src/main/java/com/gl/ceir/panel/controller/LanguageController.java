@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gl.ceir.panel.dto.response.ApiStatusDto;
 import com.gl.ceir.panel.service.LanguageService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,6 +36,14 @@ public class LanguageController {
 	@GetMapping("/{language}")
 	public ResponseEntity<?> getById(@PathVariable String language) {
 		log.info("language: {}", language);
+		language = "en.json".equals(language) ? "us.json": language;
+		log.info("language: {}", language);
 		return new ResponseEntity<>(languageService.languagejson(language), HttpStatus.OK);
+	}
+	
+	@Operation(hidden = true)
+	@GetMapping("update/{language}")
+	public ResponseEntity<?> sendotp(@PathVariable String language) {
+		return new ResponseEntity<>(languageService.updateLanguage(language), HttpStatus.OK);
 	}
 }

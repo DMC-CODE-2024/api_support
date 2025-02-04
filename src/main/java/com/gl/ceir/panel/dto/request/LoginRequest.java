@@ -23,4 +23,5 @@ public class LoginRequest implements Serializable {
 	@Schema(name = "password", example = "password")
 	@NotBlank
 	private String password;
+	private String publicIP;
 }

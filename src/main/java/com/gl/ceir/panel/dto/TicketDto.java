@@ -66,4 +66,5 @@ public class TicketDto  implements Serializable {
 	private String province;
 	private String district;
 	private String commune;
+	private String language;
 }
