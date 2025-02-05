@@ -10,8 +10,8 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.gl.ceir</groupId>
-	<artifactId>panel</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>api_support</artifactId>
+	<version>1.0.0</version>
 	<name>panel</name>
 	<description>EIRS Backend</description>
 	<packaging>jar</packaging>

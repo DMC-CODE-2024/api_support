@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -19,6 +20,7 @@ import lombok.extern.log4j.Log4j2;
 @Component
 @Log4j2
 public class AuthEntryPointJwt implements AuthenticationEntryPoint {
+	@Autowired private ObjectMapper objectMapper;
 	@Override
 	public void commence(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException authException) throws IOException, ServletException {
@@ -32,8 +34,6 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
 		body.put("error", "Unauthorized");
 		body.put("message", authException.getMessage());
 		body.put("path", request.getServletPath());
-
-		final ObjectMapper mapper = new ObjectMapper();
-		mapper.writeValue(response.getOutputStream(), body);
+		objectMapper.writeValue(response.getOutputStream(), body);
 	}
 }
