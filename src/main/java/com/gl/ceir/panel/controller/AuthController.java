@@ -73,6 +73,12 @@ public class AuthController {
 		log.info("Login request:{}", request);
 		return ResponseEntity.ok(authSecurity.isSecurityPassed(loginRequest, request));
 	}
+	
+	@Operation(hidden = true)
+	@PostMapping("/status")
+	public ResponseEntity<?> status() {
+		return ResponseEntity.ok(HttpStatus.OK);
+	}
 
 	@Operation(hidden = true)
 	@PostMapping("/signup")

@@ -66,6 +66,8 @@ public class AclService {
 	private final GroupFeatureRepository groupFeatureRepository;
 	@Value("${eirs.allowed.countries.to.access.public.portal:}")
 	private List<String> allowedCountries;
+	@Value("${eirs.region.flag.enable:true}")
+	private boolean eirsRegionFlagEnable;
 	private final AuditTrailService auditTrailService;
 	
 	public List<RoleFeatureModuleAccessEntity> save(AclTreeDto aclDto, HttpServletRequest request) {
@@ -182,6 +184,10 @@ public class AclService {
 	}
 	public boolean isAccessAllow(String ip) {
 		CheckCountryResponseDto response = CheckCountryResponseDto.builder().countryCode("IN").build();
+		if(eirsRegionFlagEnable==false) {
+			log.info("Region service flag disabled so allow all region");
+			return true;
+		}
 		try {
 			InetAddress address = InetAddress.getByName(ip);
 			CheckCountryDto ccd = CheckCountryDto.builder().ip(ip).ipType(address instanceof Inet6Address ? "ipv6": "ipv4").build();
@@ -194,5 +200,29 @@ public class AclService {
 		log.info("Ip:{} has country:{}, is allowed to access portal:{}, allowed countries from configuration:{}", ip,
 				response.getCountryCode(), allowedCountries.contains(response.getCountryCode()), allowedCountries);
 		return allowedCountries.contains(response.getCountryCode());
+	}
+	public Map<String, String> checkRegion(String ip) {
+		Map<String, String> map = new HashMap<String, String>();
+		CheckCountryResponseDto response = CheckCountryResponseDto.builder().countryCode("IN").build();
+		if(eirsRegionFlagEnable==false) {
+			map.put("allow", "yes");
+			log.info("Region service flag disabled so allow all region");
+			return map;
+		}
+		try {
+			InetAddress address = InetAddress.getByName(ip);
+			CheckCountryDto ccd = CheckCountryDto.builder().ip(ip).ipType(address instanceof Inet6Address ? "ipv6": "ipv4").build();
+			log.info("Request to check country:{}", ccd);
+			response = checkIpCountryRemoteRepostiory.check(ccd);
+			log.info("Response to check country:{}", response);
+			map.put("allow", allowedCountries.contains(response.getCountryCode()) ? "yes": "no");
+			map.put("servicedown", "no");
+		} catch (Exception e) {
+			log.error("Error:{} to check country for ip:{}", e.getMessage(), ip);
+			map.put("servicedown", "yes");
+		}
+		log.info("Ip:{} has country:{}, is allowed to access portal:{}, allowed countries from configuration:{}", ip,
+				response.getCountryCode(), allowedCountries.contains(response.getCountryCode()), allowedCountries);
+		return map;
 	}
 }

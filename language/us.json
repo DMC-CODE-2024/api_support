@@ -156,7 +156,9 @@
         "emailverifyOtpFailed": "Email OTP Verification Fail",
         "userNidFileSizeExceeded": "2MB max file size can be attached.",
         "userFileSizeExceeded": "2MB max file size can be attached",
-        "userEmpIdCardFileSizeExceeded": "2MB max file size can be attached"
+        "userEmpIdCardFileSizeExceeded": "2MB max file size can be attached",
+        "outOfRegionMessage": "This App is currently not available in your country or region",
+        "regionServiceNotAvailable": "Sorry, the service is not available temporarily. Please try after sometime later."
     },
     "error": {
         "emailAlreadyRegistered": "Sorry, this email address is already registered."

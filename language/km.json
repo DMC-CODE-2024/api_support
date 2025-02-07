@@ -111,7 +111,9 @@
         "parallelSessionLimitBreached": "វគ្គប៉ារ៉ាឡែលមិនត្រូវបានអនុញ្ញាតឱ្យចូល",
         "userNidFileSizeExceeded": "ទំហំឯកសារអតិបរមា 2MB អាចត្រូវបានភ្ជាប់។",
         "userFileSizeExceeded": "ទំហំឯកសារអតិបរមា 2MB អាចត្រូវបានភ្ជាប់",
-        "userEmpIdCardFileSizeExceeded": "ទំហំឯកសារអតិបរមា 2MB អាចត្រូវបានភ្ជាប់"
+        "userEmpIdCardFileSizeExceeded": "ទំហំឯកសារអតិបរមា 2MB អាចត្រូវបានភ្ជាប់",
+        "outOfRegionMessage": "បច្ចុប្បន្នកម្មវិធីនេះមិនមាននៅក្នុងប្រទេស ឬតំបន់របស់អ្នកទេ។",
+        "regionServiceNotAvailable": "សុំទោស សេវាកម្មនេះមិនអាចប្រើបានជាបណ្តោះអាសន្នទេ។ សូមព្យាយាមបន្ទាប់ពីពេលខ្លះក្រោយ។"
     },
     "emailAlreadyRegistered": "សុំទោស អាសយដ្ឋានអ៊ីមែលនេះត្រូវបានចុះឈ្មោះរួចហើយ។",
     "brand": "កម្មវិធីប្រព័ន្ធចុះបញ្ជីអត្តសញ្ញាណឧបករណ៍ទូរគមនាគមន៍ប្រើស៊ីម {{company}}",

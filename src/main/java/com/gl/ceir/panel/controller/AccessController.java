@@ -100,9 +100,7 @@ public class AccessController {
 	        String headerName = (String)headerNames.nextElement();
 	        log.info("header: " + headerName + ":" + request.getHeader(headerName));
 	    }
-		Map<String, Boolean> map = new HashMap<String, Boolean>();
 		log.info("Request ip:{}", request.getRemoteAddr());
-		map.put("allow", aclService.isAccessAllow(request.getRemoteAddr()));
-		return new ResponseEntity<>(map, HttpStatus.OK);
+		return new ResponseEntity<>(aclService.checkRegion(request.getRemoteAddr()), HttpStatus.OK);
 	}
 }
