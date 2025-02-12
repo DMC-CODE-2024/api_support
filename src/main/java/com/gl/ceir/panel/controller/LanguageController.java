@@ -35,9 +35,7 @@ public class LanguageController {
 			@Content(mediaType = "application/json", schema = @Schema(implementation = String.class)) }) })
 	@GetMapping("/{language}")
 	public ResponseEntity<?> getById(@PathVariable String language) {
-		log.info("language: {}", language);
 		language = "en.json".equals(language) ? "us.json": language;
-		log.info("language: {}", language);
 		return new ResponseEntity<>(languageService.languagejson(language), HttpStatus.OK);
 	}
 	

@@ -75,9 +75,9 @@ public class AuthController {
 	}
 	
 	@Operation(hidden = true)
-	@PostMapping("/status")
-	public ResponseEntity<?> status() {
-		return ResponseEntity.ok(HttpStatus.OK);
+	@GetMapping("/status")
+	public ResponseEntity<?> status(HttpServletRequest request) {
+		return new ResponseEntity<>(aclService.checkRegion(request.getRemoteAddr()), HttpStatus.OK);
 	}
 
 	@Operation(hidden = true)

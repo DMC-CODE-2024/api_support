@@ -7,7 +7,9 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
+import org.apache.commons.collections4.map.PassiveExpiringMap;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.repository.init.ResourceReader;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gl.ceir.panel.repository.app.UserRepository;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -31,13 +34,24 @@ public class LanguageService {
 	private final ResourceLoader resourceLoader;
 	private final UserService userService;
 	private final UserRepository userRepository;
+	private final PassiveExpiringMap<String, Object> languagemap;
 
+	@PostConstruct
+	private void init() {
+		this.languagejson("us.json");
+		this.languagejson("km.json");
+	}
 	public Object languagejson(String language) {
 		Object json = null;
 		try {
-			log.info("Language:{}", language);
 			this.updateLanguage(language);
-			return read(language);
+			json = languagemap.get(language);
+			if(ObjectUtils.isEmpty(json)) {
+				log.info("Missing langage data from cache going to load from file path");
+				json = read(language);
+				languagemap.put(language, json);
+			}
+			return json;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -63,4 +77,5 @@ public class LanguageService {
 		}
 		return content;
 	}
+	
 }

@@ -6,7 +6,6 @@ import java.util.List;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
@@ -22,7 +21,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity(name="countries_Phone_code")
+@Entity(name="countries_phone_code")
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor

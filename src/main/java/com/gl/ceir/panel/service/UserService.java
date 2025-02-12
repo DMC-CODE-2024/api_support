@@ -67,6 +67,7 @@ import com.gl.ceir.panel.service.helper.NotificationHelper;
 import com.gl.ceir.panel.util.FileUploadUtil;
 import com.gl.ceir.panel.util.OperatorUtil;
 import com.gl.ceir.panel.util.OtpUtil;
+import com.gl.ceir.panel.util.PasswordUtil;
 import com.gl.ceir.panel.util.PlaceholderUtil;
 
 import jakarta.annotation.PostConstruct;
@@ -102,6 +103,7 @@ public class UserService {
 	private final FeatureService featureService;
 	private final RedmineBackendService redmineBackendService;
 	private final PlaceholderUtil placeholderUtil; 
+	private final PasswordUtil passwordUtil;
 	@Value("${eirs.otp.mobile.change.message:Please use this otp: {otp} to access the tickets}")
 	private String mobileChangeMessage;
 	@Value("${eirs.otp.email.change.message:Please use this otp: {otp} to access the tickets}")
@@ -428,7 +430,7 @@ public class UserService {
 		users.forEach(user -> {
 			try {
 				if(ObjectUtils.isNotEmpty(featureobj)) {
-					String password = RandomStringUtils.randomAlphabetic(8);
+					String password = passwordUtil.getPassword();
 					user.setPasswordDate(LocalDateTime.now());
 					user.setPassword(encoder.encode(password));
 					Map<String, String> values = new HashMap<String, String>();
